@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 import com.training.domain.Review;
 
 public interface ReviewRepository extends CrudRepository<Review, Integer>{
-	public List<Review> findByProductId(int pid);
+	public List<Review> findByProductIdAndVerified(int pid,boolean verified);
 }

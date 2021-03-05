@@ -6,6 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="review")
 public class Review {
@@ -17,6 +19,10 @@ public class Review {
 	String reviewText;
 	int rating;
 	int productId;
+	
+	@JsonIgnore
+	boolean verified;
+	
 	
 	public Review() {
 		
@@ -68,6 +74,14 @@ public class Review {
 
 	public void setProductId(int productId) {
 		this.productId = productId;
+	}
+
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
 	
 	

@@ -29,22 +29,28 @@ public class ReviewController {
 	@Autowired
 	DiscoveryClient dc;
 	
+	@Autowired
+	ProductService service;
+	
 	// add a review to a product
 	@PostMapping("/reviews")
 	public ResponseEntity<Review> addReview(@RequestBody Review r) {
 		
-		List<ServiceInstance> instances = dc.getInstances("productservice");
-		String productServiceURL = instances.get(0).getUri().toString();
-		
 		int pid = r.getProductId();
-		RestTemplate template = new RestTemplate();
+		
 		try {
-			String pJson = template.getForObject(productServiceURL+"/products/"+pid, String.class);
+			Product p = service.getProductById(pid);
+			if(p.getId() == -1) {
+				System.out.println("Looks like circuit broken............. Falling back...........");
+				r.setVerified(false);
+			}else {
+				r.setVerified(true);
+			}
 			Review added = dao.save(r);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(URI.create("/reviews/"+added.getId()));
 			return new ResponseEntity<>(added, headers, HttpStatus.CREATED);
-		} catch (RestClientException e) {
+		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -52,7 +58,7 @@ public class ReviewController {
 	// retrieve reviews of a a product
 	@GetMapping("/reviews") // /reviews?pid=1
 	public List<Review> getReviewsForProductId(@RequestParam("pid") int pid){
-		return dao.findByProductId(pid);
+		return dao.findByProductIdAndVerified(pid,true);
 	}
 	
 }
